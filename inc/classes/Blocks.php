@@ -102,9 +102,14 @@ class Blocks {
 		// null means "inherit". Only a value the editor actually set overrides
 		// the filter, which is why these attributes declare no default in
 		// block.json. A declared default is indistinguishable from a choice.
-		$value  = isset( $attributes['value'] ) ? Defaults::clamp( $attributes['value'] ) : $defaults['value'];
-		$hover  = isset( $attributes['hover'] ) ? (bool) $attributes['hover'] : $defaults['hover'];
-		$handle = isset( $attributes['handle'] ) ? (bool) $attributes['handle'] : $defaults['handle'];
+		$value = isset( $attributes['value'] ) ? Defaults::clamp( $attributes['value'] ) : $defaults['value'];
+		$hover = isset( $attributes['hover'] ) ? (bool) $attributes['hover'] : $defaults['hover'];
+
+		// This plugin asks "can you drag anywhere?", which reads the right way
+		// round in the editor and is on by default. The component asks the
+		// opposite question with its `handle` attribute, so it is inverted
+		// here, at the one point where the two vocabularies meet.
+		$drag_anywhere = isset( $attributes['dragAnywhere'] ) ? (bool) $attributes['dragAnywhere'] : $defaults['dragAnywhere'];
 
 		$direction = 'vertical' === ( $attributes['direction'] ?? '' ) ? 'vertical' : 'horizontal';
 
@@ -123,7 +128,7 @@ class Blocks {
 			// than the literal string "false" as true, so an empty attribute
 			// would silently mean "on".
 			'hover'     => $hover ? 'true' : 'false',
-			'handle'    => $handle ? 'true' : 'false',
+			'handle'    => $drag_anywhere ? 'false' : 'true',
 			// The accessible name for the slider role the view script adds.
 			// Built here so it goes through the plugin's text domain rather
 			// than needing script translations wired up.

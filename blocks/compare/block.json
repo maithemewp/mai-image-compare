@@ -63,7 +63,7 @@
 		"hover": {
 			"type": "boolean"
 		},
-		"handle": {
+		"dragAnywhere": {
 			"type": "boolean"
 		}
 	},

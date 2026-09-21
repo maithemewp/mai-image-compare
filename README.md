@@ -46,14 +46,14 @@ Before is the image on the left, or on top in vertical mode. After is the other 
 | `afterLabel` | string | `""` | Optional caption shown over the after image. Empty means no label. |
 | `direction` | string | `horizontal` | `horizontal` or `vertical`. |
 | `value` | number | *unset* | Start position, 0 to 100. Unset means follow the site default. |
-| `hover` | boolean | *unset* | Slide on mouse over. Unset means follow the site default. |
-| `handle` | boolean | *unset* | Drag by the handle only. Unset means follow the site default. |
+| `hover` | boolean | *unset* | Slide on mouse over, with no clicking. Unset means follow the site default. |
+| `dragAnywhere` | boolean | *unset* | Drag from anywhere in the image, not just the handle. Unset means follow the site default. |
 
 The block also supports wide and full alignment, a custom class name, margin and padding, and WordPress's own aspect ratio control.
 
 ### Why three attributes have no default
 
-`value`, `hover` and `handle` start out with no value at all, and an untouched control writes nothing into the post. That is what lets a later change to the filter reach blocks that were saved months ago.
+`value`, `hover` and `dragAnywhere` start out with no value at all, and an untouched control writes nothing into the post. That is what lets a later change to the filter reach blocks that were saved months ago.
 
 Saving a page never pins one of these to a value. Clearing one in the editor, through the Reset or "use site default" affordance, removes it again.
 
@@ -65,9 +65,9 @@ Three settings are set once per site, in code:
 
 ```php
 add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
-	$defaults['value']  = 25;    // Divider starts at 25%.
-	$defaults['hover']  = true;  // Slide on mouse over.
-	$defaults['handle'] = true;  // Drag by the handle only.
+	$defaults['value']        = 25;    // Divider starts at 25%.
+	$defaults['hover']        = true;  // Slide on mouse over.
+	$defaults['dragAnywhere'] = false; // Only the handle moves the divider.
 
 	return $defaults;
 } );
@@ -77,11 +77,25 @@ add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
 | --- | --- | --- | --- |
 | `value` | int | `50` | Where the divider starts, 0 to 100. Values outside that range are clamped. |
 | `hover` | bool | `false` | Slide as the mouse moves over the block, with no click. |
-| `handle` | bool | `false` | Only a drag that starts on the handle moves the divider. |
+| `dragAnywhere` | bool | `true` | Drag from anywhere in the image. Turn it off and only a drag that starts on the handle moves the divider. |
 
 A block can still deviate. The filter sets what a block inherits, and a block that sets one of the three uses its own value instead. An explicit "off" on a block is a real choice, so a filter turning that setting on will not reach it.
 
 Change the filter and every block that left the control alone follows on the next page view. Nothing needs re-saving.
+
+### How the two drag settings relate
+
+They answer different questions. Slide on hover asks whether you have to press the mouse button at all. Drag anywhere asks where you have to grab.
+
+| Slide on hover | Drag anywhere | What it feels like |
+| --- | --- | --- |
+| off | on | Press and hold anywhere, then drag. This is the default. |
+| off | off | Press and hold the handle. Dragging the image does nothing. |
+| on | on or off | The divider follows the pointer. No clicking. |
+
+Turning slide on hover on makes drag anywhere irrelevant, because there is no grabbing left to restrict.
+
+One note for anyone reading the markup: the underlying component asks the opposite question through a `handle` attribute, so `dragAnywhere` on renders as `handle="false"`. The inversion happens in one place, where the block renders.
 
 There is deliberately no setting for keyboard control. It is always on.
 

@@ -84,7 +84,7 @@ check('start position honours per-block value 25', Math.round(await val()) === 2
 check('direction is vertical', (await page.$eval(SEL, (el) => el.direction)) === 'vertical');
 check('aria-orientation vertical', (await aria('aria-orientation')) === 'vertical');
 check('hover on', (await page.$eval(SEL, (el) => el.hover)) === true);
-check('handle-only on', (await page.$eval(SEL, (el) => el.handle)) === true);
+check('drag anywhere off maps to the component handle attribute', (await page.$eval(SEL, (el) => el.handle)) === true);
 check('labels render', (await page.$$eval('.mai-image-compare__label', (n) => n.map((x) => x.textContent))).join(',') === 'Before,After');
 check('alt override applied', (await page.$eval('.mai-image-compare__side--before img', (el) => el.alt)) === 'Overridden before alt');
 check('library alt used when no override', (await page.$eval('.mai-image-compare__side--after img', (el) => el.alt)) === 'Library alt for after');
@@ -175,10 +175,12 @@ add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
 	defaults_placeholder
 	return $defaults;
 } );
-`.replace('defaults_placeholder', "$defaults['value'] = 30; $defaults['hover'] = true; $defaults['handle'] = true;"));
+`.replace('defaults_placeholder', "$defaults['value'] = 30; $defaults['hover'] = true; $defaults['dragAnywhere'] = false;"));
 
 await go('mic-default');
 const filtered = await page.$eval(SEL, (el) => ({ v: Math.round(el.value), h: el.hover, d: el.handle }));
+// `d` is the component's `handle`, the inverse of our `dragAnywhere`. The
+// filter turns dragAnywhere off, so handle must come back true.
 check('filter moves a block that overrode nothing', filtered.v === 30 && filtered.h === true && filtered.d === true, JSON.stringify(filtered));
 
 await go('mic-loaded');
@@ -195,6 +197,7 @@ check('an explicit off is not overwritten by a filter turning it on', explicitOf
 fs.unlinkSync(MU);
 await go('mic-default');
 const restored = await page.$eval(SEL, (el) => ({ v: Math.round(el.value), h: el.hover, d: el.handle }));
+// Built-in dragAnywhere is true, so the component's handle is false.
 check('removing the filter restores the built-in defaults', restored.v === 50 && restored.h === false && restored.d === false, JSON.stringify(restored));
 
 // --- 12. Clean console, no external requests

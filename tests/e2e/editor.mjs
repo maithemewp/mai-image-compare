@@ -6,7 +6,7 @@ import fs from 'fs';
 const MU = `${process.env.HOME}/Herd/sportsdataio/wp-content/mu-plugins/mic-defaults-test.php`;
 fs.writeFileSync(MU, `<?php
 add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
-	$defaults['value'] = 30; $defaults['hover'] = true; $defaults['handle'] = true;
+	$defaults['value'] = 30; $defaults['hover'] = true; $defaults['dragAnywhere'] = false;
 	return $defaults;
 } );
 `);

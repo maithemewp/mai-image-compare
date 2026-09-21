@@ -10,7 +10,7 @@ no options, no admin notices, no telemetry, no runtime HTTP. If a change adds an
 of those, it is the wrong change.
 
 ## The inherit invariant (load-bearing)
-`value`, `hover` and `handle` have NO `default` in block.json, on purpose.
+`value`, `hover` and `dragAnywhere` have NO `default` in block.json, on purpose.
 
 - Undefined means "follow the site default", resolved at render from
   `mai_image_compare_defaults`.
@@ -19,6 +19,10 @@ of those, it is the wrong change.
   saved blocks.
 - `hover: false` on a block is a real choice and must beat a filter setting it
   true. Never coerce an unset attribute to `false` anywhere in the chain.
+- `dragAnywhere` is the INVERSE of the component's `handle` attribute, and
+  defaults to true. The flip happens once, in Blocks::render() and in the
+  editor's property effect. Do not let the component's vocabulary leak any
+  further in than that.
 - The block is server-rendered for the same reason. Never give it a `save()`.
 
 Any change here needs the Playwright filter phase re-run (it writes an mu-plugin,

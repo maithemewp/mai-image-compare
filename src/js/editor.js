@@ -2,7 +2,7 @@
  * Editor UI for the compare block.
  *
  * Three settings are `undefined` until an editor deliberately changes them:
- * start position, slide on hover, and drag by handle only. Undefined means
+ * start position, slide on hover, and drag anywhere. Undefined means
  * "follow the site default", which PHP resolves from the
  * `mai_image_compare_defaults` filter on every render. That is why those three
  * attributes declare no default in block.json: a declared default would be
@@ -43,7 +43,7 @@ import metadata from '../../blocks/compare/block.json';
 const SITE_DEFAULTS = window.maiImageCompareDefaults || {
 	value: 50,
 	hover: false,
-	handle: false,
+	dragAnywhere: true,
 };
 
 /**
@@ -200,7 +200,7 @@ function Edit( { attributes, setAttributes } ) {
 		direction,
 		value,
 		hover,
-		handle,
+		dragAnywhere,
 	} = attributes;
 
 	const beforeMedia = useSelect(
@@ -218,7 +218,10 @@ function Edit( { attributes, setAttributes } ) {
 	const resolved = {
 		value: undefined === value ? SITE_DEFAULTS.value : value,
 		hover: undefined === hover ? SITE_DEFAULTS.hover : hover,
-		handle: undefined === handle ? SITE_DEFAULTS.handle : handle,
+		dragAnywhere:
+			undefined === dragAnywhere
+				? SITE_DEFAULTS.dragAnywhere
+				: dragAnywhere,
 	};
 
 	// The images live inside the component's shadow DOM, where they cannot see
@@ -247,8 +250,9 @@ function Edit( { attributes, setAttributes } ) {
 	// `hover` and `direction` are observed attributes, so React setting them is
 	// enough. `value` and `handle` are read once when the element connects and
 	// never again, so those two are pushed as properties, which do have
-	// setters. The element lives in the canvas iframe, so `whenDefined` is read
-	// from that document's own window rather than the admin one.
+	// setters. The component's `handle` is the inverse of our `dragAnywhere`.
+	// The element lives in the canvas iframe, so `whenDefined` is read from
+	// that document's own window rather than the admin one.
 	useEffect( () => {
 		const el = slider.current;
 
@@ -264,9 +268,9 @@ function Edit( { attributes, setAttributes } ) {
 
 		view.customElements.whenDefined( 'img-comparison-slider' ).then( () => {
 			el.value = resolved.value;
-			el.handle = resolved.handle;
+			el.handle = ! resolved.dragAnywhere;
 		} );
-	}, [ resolved.value, resolved.handle, beforeId, afterId ] );
+	}, [ resolved.value, resolved.dragAnywhere, beforeId, afterId ] );
 
 	const controls = (
 		<InspectorControls>
@@ -391,16 +395,26 @@ function Edit( { attributes, setAttributes } ) {
 
 				<InheritToggle
 					label={ __( 'Slide on hover', 'mai-image-compare' ) }
+					help={ __(
+						'The divider follows the pointer with no clicking.',
+						'mai-image-compare'
+					) }
 					value={ hover }
 					siteDefault={ SITE_DEFAULTS.hover }
 					onChange={ ( next ) => setAttributes( { hover: next } ) }
 				/>
 
 				<InheritToggle
-					label={ __( 'Drag by handle only', 'mai-image-compare' ) }
-					value={ handle }
-					siteDefault={ SITE_DEFAULTS.handle }
-					onChange={ ( next ) => setAttributes( { handle: next } ) }
+					label={ __( 'Drag anywhere', 'mai-image-compare' ) }
+					help={ __(
+						'Off means only the handle moves the divider. Ignored while Slide on hover is on.',
+						'mai-image-compare'
+					) }
+					value={ dragAnywhere }
+					siteDefault={ SITE_DEFAULTS.dragAnywhere }
+					onChange={ ( next ) =>
+						setAttributes( { dragAnywhere: next } )
+					}
 				/>
 			</PanelBody>
 		</InspectorControls>

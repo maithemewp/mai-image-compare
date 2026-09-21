@@ -22,12 +22,12 @@ class Defaults {
 	 * Built-in values, used when no filter changes them. These mirror
 	 * img-comparison-slider's own defaults.
 	 *
-	 * @var array{value:int,hover:bool,handle:bool}
+	 * @var array{value:int,hover:bool,dragAnywhere:bool}
 	 */
 	private const BUILT_IN = [
-		'value'  => 50,
-		'hover'  => false,
-		'handle' => false,
+		'value'        => 50,
+		'hover'        => false,
+		'dragAnywhere' => true,
 	];
 
 	/**
@@ -36,15 +36,15 @@ class Defaults {
 	 * Cast at the boundary: a filter is third-party input, and a string '25'
 	 * from a callback would otherwise reach the markup untyped.
 	 *
-	 * @return array{value:int,hover:bool,handle:bool}
+	 * @return array{value:int,hover:bool,dragAnywhere:bool}
 	 */
 	public static function get(): array {
 		$defaults = (array) apply_filters( 'mai_image_compare_defaults', self::BUILT_IN );
 
 		return [
-			'value'  => self::clamp( $defaults['value'] ?? self::BUILT_IN['value'] ),
-			'hover'  => (bool) ( $defaults['hover'] ?? self::BUILT_IN['hover'] ),
-			'handle' => (bool) ( $defaults['handle'] ?? self::BUILT_IN['handle'] ),
+			'value'        => self::clamp( $defaults['value'] ?? self::BUILT_IN['value'] ),
+			'hover'        => (bool) ( $defaults['hover'] ?? self::BUILT_IN['hover'] ),
+			'dragAnywhere' => (bool) ( $defaults['dragAnywhere'] ?? self::BUILT_IN['dragAnywhere'] ),
 		];
 	}
 
