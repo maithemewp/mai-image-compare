@@ -379,6 +379,17 @@ function Edit( { attributes, setAttributes } ) {
 				) }
 
 				<InheritToggle
+					label={ __( 'Slide on hover', 'mai-image-compare' ) }
+					help={ __(
+						'The divider follows the pointer with no clicking.',
+						'mai-image-compare'
+					) }
+					value={ hover }
+					siteDefault={ SITE_DEFAULTS.hover }
+					onChange={ ( next ) => setAttributes( { hover: next } ) }
+				/>
+
+				<InheritToggle
 					label={ __( 'Drag anywhere', 'mai-image-compare' ) }
 					help={
 						resolved.hover
@@ -397,17 +408,6 @@ function Edit( { attributes, setAttributes } ) {
 					onChange={ ( next ) =>
 						setAttributes( { dragAnywhere: next } )
 					}
-				/>
-
-				<InheritToggle
-					label={ __( 'Slide on hover', 'mai-image-compare' ) }
-					help={ __(
-						'The divider follows the pointer with no clicking.',
-						'mai-image-compare'
-					) }
-					value={ hover }
-					siteDefault={ SITE_DEFAULTS.hover }
-					onChange={ ( next ) => setAttributes( { hover: next } ) }
 				/>
 			</PanelBody>
 
