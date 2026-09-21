@@ -3,6 +3,12 @@
     "description": "A before/after image comparison block for WordPress.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/bizbudding/deployable-guard"
+        }
+    ],
     "authors": [
         {
             "name": "BizBudding",
@@ -21,5 +27,19 @@
     "config": {
         "optimize-autoloader": true,
         "sort-packages": true
+    },
+    "require-dev": {
+        "bizbudding/deployable-guard": "^1"
+    },
+    "scripts": {
+        "install-git-hooks": [
+            "sh -c 'test -f vendor/bin/deployable-guard && php vendor/bin/deployable-guard install-hook || true'"
+        ],
+        "post-install-cmd": [
+            "@install-git-hooks"
+        ],
+        "post-update-cmd": [
+            "@install-git-hooks"
+        ]
     }
 }

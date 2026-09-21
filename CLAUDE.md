@@ -65,6 +65,15 @@ component's own wrapper. The ratio therefore travels as
 `--mai-image-compare-ratio`, which PHP sets from the chosen ratio when there is
 one and from the first image's metadata otherwise.
 
+## Committing vendor/
+`vendor/` ships committed and prod-only, because deploys are a raw git tree with
+no composer step on the server. Run `composer install --no-dev` before any
+commit that touches `vendor/`, or the committed autoloader and `installed.json`
+name dev packages that are not in the repo. `bizbudding/deployable-guard` gates
+this locally through a pre-commit hook and in CI through
+`.github/workflows/deployable.yml`; the CI job is the hard gate, since the local
+hook skips itself when the dev binary is absent.
+
 ## Testing
 No PHPUnit suite yet. Verification is a headless Playwright run against
 ~/Herd/sportsdataio covering the front end (drag, touch, keyboard, both

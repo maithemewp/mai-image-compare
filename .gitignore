@@ -19,3 +19,4 @@
 
 # Screenshots and logs from the e2e runs.
 /tests/e2e/output/
+.githooks/
