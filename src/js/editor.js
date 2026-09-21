@@ -149,10 +149,18 @@ function ImageField( { label, id, onSelect, onRemove } ) {
  * @param {string}   props.help        Help text under the control.
  * @param {boolean}  props.value       The block's value, or undefined to inherit.
  * @param {boolean}  props.siteDefault What the filter currently resolves to.
+ * @param {boolean}  props.disabled    Greys the control out when it has no effect.
  * @param {Function} props.onChange    Called with true, false or undefined.
  * @return {Element} The control.
  */
-function InheritToggle( { label, help, value, siteDefault, onChange } ) {
+function InheritToggle( {
+	label,
+	help,
+	value,
+	siteDefault,
+	disabled = false,
+	onChange,
+} ) {
 	const on = __( 'On', 'mai-image-compare' );
 	const off = __( 'Off', 'mai-image-compare' );
 
@@ -176,6 +184,7 @@ function InheritToggle( { label, help, value, siteDefault, onChange } ) {
 			__next40pxDefaultSize
 			label={ label }
 			help={ help }
+			disabled={ disabled }
 			value={ selected }
 			options={ [
 				{ value: '', label: inheritLabel },
@@ -371,12 +380,20 @@ function Edit( { attributes, setAttributes } ) {
 
 				<InheritToggle
 					label={ __( 'Drag anywhere', 'mai-image-compare' ) }
-					help={ __(
-						'Off means only the handle moves the divider. Ignored while Slide on hover is on.',
-						'mai-image-compare'
-					) }
+					help={
+						resolved.hover
+							? __(
+									'Slide on hover is on, so the divider already follows the pointer and there is nothing left to restrict.',
+									'mai-image-compare'
+								)
+							: __(
+									'Off means only the handle moves the divider.',
+									'mai-image-compare'
+								)
+					}
 					value={ dragAnywhere }
 					siteDefault={ SITE_DEFAULTS.dragAnywhere }
+					disabled={ resolved.hover }
 					onChange={ ( next ) =>
 						setAttributes( { dragAnywhere: next } )
 					}

@@ -97,7 +97,7 @@ They answer different questions. Slide on hover asks whether you have to press t
 | off | off | Press and hold the handle. Dragging the image does nothing. |
 | on | on or off | The divider follows the pointer. No clicking. |
 
-Turning slide on hover on makes drag anywhere irrelevant, because there is no grabbing left to restrict.
+Turning slide on hover on makes drag anywhere irrelevant, because there is no grabbing left to restrict. The editor greys the Drag anywhere control out while that is the case and says why, rather than leaving a control that quietly does nothing. That applies whether hover was turned on for the block or by the filter.
 
 One note for anyone reading the markup: the underlying component asks the opposite question through a `handle` attribute, so `dragAnywhere` on renders as `handle="false"`. The inversion happens in one place, where the block renders.
 

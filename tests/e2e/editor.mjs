@@ -129,6 +129,23 @@ const dragDefault  = await inheritOption( 'Drag anywhere' );
 check( 'slide on hover names its inherited value', 'Default (On)' === hoverDefault.trim(), hoverDefault );
 check( 'drag anywhere names its inherited value', 'Default (Off)' === dragDefault.trim(), dragDefault );
 
+// The mu-plugin turns hover on, so Drag anywhere has nothing to restrict and
+// must be greyed out rather than quietly doing nothing.
+const dragDisabled = await page.getByLabel('Drag anywhere', { exact: true }).isDisabled().catch(()=>null);
+check('drag anywhere is disabled while slide on hover is on', dragDisabled === true, String(dragDisabled));
+const dragHelp = await page.locator('.components-base-control__help, .components-input-control__help').filter({ hasText: 'Slide on hover is on' }).count();
+check('disabled drag anywhere says why', dragHelp > 0, `${dragHelp} matches`);
+check('slide on hover itself stays enabled', (await page.getByLabel('Slide on hover', { exact: true }).isDisabled()) === false);
+
+// And it comes back the moment hover is turned off on this block, rather than
+// waiting for a reload.
+await page.getByLabel('Slide on hover', { exact: true }).selectOption('off');
+await page.waitForTimeout(600);
+check('drag anywhere re-enables when hover is turned off', (await page.getByLabel('Drag anywhere', { exact: true }).isDisabled()) === false);
+await page.getByLabel('Slide on hover', { exact: true }).selectOption('');
+await page.waitForTimeout(600);
+check('drag anywhere disables again on returning to the inherited on', (await page.getByLabel('Drag anywhere', { exact: true }).isDisabled()) === true);
+
 const startBox = await page.locator('.components-checkbox-control__label:has-text("Use site default start position")').textContent().catch(()=>'');
 check('start position checkbox names the site default', /30%/.test(startBox || ''), startBox || '');
 await page.screenshot({ path: OUT + 'editor-3-inspector.png', fullPage:false });

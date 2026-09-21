@@ -42,6 +42,10 @@ checks the three interactions, removes it again).
   div to `inline`. Our CSS needs a matching-specificity selector to win, hence
   the type and attribute selectors in front.css. They are not decoration.
 - `keyboard` stays enabled. Never expose a way to turn it off.
+- `hover` makes `handle` a no-op: with hover on, a mouse move slides the
+  divider whatever `handle` says. The editor disables the Drag anywhere control
+  on `resolved.hover`, not on the block's own `hover`, so a filter turning hover
+  on greys it out too.
 
 ## Editor gotchas
 - The post canvas is an iframe with its own custom element registry. The
