@@ -1,0 +1,25 @@
+{
+    "name": "maithemewp/mai-image-compare",
+    "description": "A before/after image comparison block for WordPress.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "BizBudding",
+            "homepage": "https://bizbudding.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "yahnis-elsts/plugin-update-checker": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mai\\ImageCompare\\": "inc/classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

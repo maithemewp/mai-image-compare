@@ -1,0 +1,74 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "mai-image-compare/compare",
+	"title": "Mai Image Compare",
+	"category": "media",
+	"icon": "image-flip-horizontal",
+	"description": "Compare two images with a draggable divider.",
+	"keywords": [
+		"before",
+		"after",
+		"compare",
+		"comparison",
+		"slider",
+		"image"
+	],
+	"textdomain": "mai-image-compare",
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		],
+		"customClassName": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"dimensions": {
+			"aspectRatio": true
+		}
+	},
+	"attributes": {
+		"beforeId": {
+			"type": "number"
+		},
+		"afterId": {
+			"type": "number"
+		},
+		"beforeAlt": {
+			"type": "string",
+			"default": ""
+		},
+		"afterAlt": {
+			"type": "string",
+			"default": ""
+		},
+		"beforeLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"afterLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"direction": {
+			"type": "string",
+			"default": "horizontal"
+		},
+		"value": {
+			"type": "number"
+		},
+		"hover": {
+			"type": "boolean"
+		},
+		"handle": {
+			"type": "boolean"
+		}
+	},
+	"editorScript": "file:../../build/mai-image-compare-editor.js",
+	"editorStyle": "file:../../build/mai-image-compare-editor.css",
+	"viewScript": "file:../../build/mai-image-compare.js",
+	"style": "file:../../build/mai-image-compare.css"
+}

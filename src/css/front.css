@@ -1,0 +1,91 @@
+/**
+ * The component is a shadow-DOM custom element, so everything here styles
+ * either the block box or our own slotted markup. Its internals are reachable
+ * only through the custom properties it exposes, which a theme can set on
+ * :root or on the block class.
+ *
+ * The block box is the slider element itself on the front end, and a wrapping
+ * div in the editor (React writes `classname` rather than `class` onto a
+ * custom element, so the block's own props cannot go on the slider there).
+ * Rules are written to work either way: the box by class, everything inside it
+ * by the `img-comparison-slider` type selector.
+ */
+
+.wp-block-mai-image-compare-compare {
+
+	/* The host defaults to inline-block, which would leave the block sitting
+	   at the image's intrinsic width instead of filling its column. */
+	display: block;
+	width: 100%;
+
+	/* Falls back to the first image's own shape, which PHP reads from the
+	   attachment metadata so the box is correct before any image loads. An
+	   aspect ratio chosen in the editor is written into the same property, so
+	   the images inside the shadow DOM cannot disagree with the box. */
+	aspect-ratio: var(--mai-image-compare-ratio, auto);
+}
+
+/* The attribute selector is load-bearing, not decoration. The component's own
+   stylesheet carries `img-comparison-slider.rendered [slot='second'] { display:
+   unset }`, and `unset` on a non-inherited property means `initial`, which
+   turns our div back into an inline box with no width to hang a ratio on.
+   Matching that specificity and coming later in the cascade is what wins. */
+img-comparison-slider .mai-image-compare__side[slot] {
+	position: relative;
+	display: block;
+	width: 100%;
+
+	/* Without a ratio here, the second image sits in normal flow inside the
+	   component's shadow DOM and sets the height itself, so a portrait paired
+	   with a landscape stretches the box to the taller of the two.
+
+	   It has to come from the custom property rather than `inherit`: a slotted
+	   element inherits through the flattened tree, so `inherit` would read the
+	   component's own wrapper (aspect-ratio: auto) instead of the block box. */
+	aspect-ratio: var(--mai-image-compare-ratio, auto);
+}
+
+img-comparison-slider .mai-image-compare__image {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+
+	/* Both images fill the same box. Mismatched shapes crop rather than
+	   letterbox: bars around a comparison read as a bug to a reader, where a
+	   crop reads as a decision. */
+	object-fit: cover;
+}
+
+img-comparison-slider .mai-image-compare__label {
+	position: absolute;
+	z-index: 1;
+	top: var(--mai-image-compare-label-offset, 1rem);
+	inset-inline-start: var(--mai-image-compare-label-offset, 1rem);
+	padding: var(--mai-image-compare-label-padding, 0.25em 0.75em);
+	border-radius: var(--mai-image-compare-label-radius, 3px);
+	background: var(--mai-image-compare-label-background, rgb(0 0 0 / 70%));
+	color: var(--mai-image-compare-label-color, #fff);
+	font-size: var(--mai-image-compare-label-font-size, 0.8rem);
+	line-height: 1.4;
+
+	/* The host sets line-height 0 to kill image whitespace, and a label that
+	   swallows pointer events would block the drag underneath it. */
+	pointer-events: none;
+}
+
+/* The after label belongs on the opposite edge, so the two never collide at
+   the divider. */
+img-comparison-slider .mai-image-compare__side--after .mai-image-compare__label {
+	inset-inline-start: auto;
+	inset-inline-end: var(--mai-image-compare-label-offset, 1rem);
+}
+
+/* Vertical sliders split top and bottom, so the labels follow. */
+img-comparison-slider[direction="vertical"] .mai-image-compare__side--after .mai-image-compare__label {
+	top: auto;
+	bottom: var(--mai-image-compare-label-offset, 1rem);
+	inset-inline-start: var(--mai-image-compare-label-offset, 1rem);
+	inset-inline-end: auto;
+}

@@ -1,0 +1,18 @@
+.DS_Store
+.idea/
+.vscode/
+
+# vendor/ is committed (prod-only) so plugin updates apply without
+# `composer install`. Allowlist approach: everything in vendor is ignored
+# except the autoloader, composer's own files, and each explicitly-named
+# production package.
+/vendor/*
+!/vendor/autoload.php
+!/vendor/composer/
+!/vendor/yahnis-elsts/
+# Auto-regenerates with the current git ref, so tracking it dirties the tree
+# after every commit.
+/vendor/composer/installed.php
+
+# Node build tooling (dev-only). build/ output is committed (raw-tree deploy).
+/node_modules/

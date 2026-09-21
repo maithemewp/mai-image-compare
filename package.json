@@ -1,0 +1,29 @@
+{
+  "name": "mai-image-compare",
+  "version": "1.0.0",
+  "description": "Build tooling for the mai-image-compare front-end assets (compiled to build/).",
+  "private": true,
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "wp-scripts build --config webpack.config.js",
+    "start": "wp-scripts start --config webpack.config.js",
+    "format": "wp-scripts format src",
+    "lint:js": "wp-scripts lint-js src/js",
+    "lint:css": "wp-scripts lint-style src/css",
+    "packages-update": "wp-scripts packages-update"
+  },
+  "dependencies": {
+    "img-comparison-slider": "^8.0.7"
+  },
+  "devDependencies": {
+    "@wordpress/block-editor": "^17.1.0",
+    "@wordpress/blocks": "^16.0.0",
+    "@wordpress/components": "^40.1.0",
+    "@wordpress/core-data": "^8.0.0",
+    "@wordpress/data": "^10.55.0",
+    "@wordpress/element": "^8.7.0",
+    "@wordpress/i18n": "^6.28.0",
+    "@wordpress/scripts": "^32.6.0",
+    "webpack-remove-empty-scripts": "^1.1.1"
+  }
+}
