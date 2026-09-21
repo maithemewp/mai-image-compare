@@ -60,7 +60,14 @@ img-comparison-slider .mai-image-compare__image {
 
 img-comparison-slider .mai-image-compare__label {
 	position: absolute;
-	z-index: 1;
+
+	/* No z-index here, deliberately. The component's `.second` wrapper is
+	   positioned with z-index auto, so it creates no stacking context, and a
+	   z-index on the label would lift it into the host's stacking context
+	   above the clipped `.first` layer. The after label then stayed visible
+	   with the before image covering the whole block. The label already paints
+	   over its own image: both are absolutely positioned in the same side, and
+	   the label comes later in the markup. */
 	top: var(--mai-image-compare-label-offset, 1rem);
 	inset-inline-start: var(--mai-image-compare-label-offset, 1rem);
 	padding: var(--mai-image-compare-label-padding, 0.25em 0.75em);

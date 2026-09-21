@@ -284,22 +284,9 @@ function Edit( { attributes, setAttributes } ) {
 				<TextControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
-					label={ __( 'Before alt text', 'mai-image-compare' ) }
-					help={ __(
-						'Leave empty to use the alt text from the Media Library.',
-						'mai-image-compare'
-					) }
-					value={ beforeAlt }
-					onChange={ ( next ) =>
-						setAttributes( { beforeAlt: next } )
-					}
-				/>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
 					label={ __( 'Before label', 'mai-image-compare' ) }
 					help={ __(
-						'Optional caption shown over this image.',
+						'Optional badge shown over this image. It only shows while this image is showing.',
 						'mai-image-compare'
 					) }
 					value={ beforeLabel }
@@ -317,20 +304,9 @@ function Edit( { attributes, setAttributes } ) {
 				<TextControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
-					label={ __( 'After alt text', 'mai-image-compare' ) }
-					help={ __(
-						'Leave empty to use the alt text from the Media Library.',
-						'mai-image-compare'
-					) }
-					value={ afterAlt }
-					onChange={ ( next ) => setAttributes( { afterAlt: next } ) }
-				/>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
 					label={ __( 'After label', 'mai-image-compare' ) }
 					help={ __(
-						'Optional caption shown over this image.',
+						'Optional badge shown over this image. It only shows while this image is showing.',
 						'mai-image-compare'
 					) }
 					value={ afterLabel }
@@ -394,17 +370,6 @@ function Edit( { attributes, setAttributes } ) {
 				) }
 
 				<InheritToggle
-					label={ __( 'Slide on hover', 'mai-image-compare' ) }
-					help={ __(
-						'The divider follows the pointer with no clicking.',
-						'mai-image-compare'
-					) }
-					value={ hover }
-					siteDefault={ SITE_DEFAULTS.hover }
-					onChange={ ( next ) => setAttributes( { hover: next } ) }
-				/>
-
-				<InheritToggle
 					label={ __( 'Drag anywhere', 'mai-image-compare' ) }
 					help={ __(
 						'Off means only the handle moves the divider. Ignored while Slide on hover is on.',
@@ -416,6 +381,51 @@ function Edit( { attributes, setAttributes } ) {
 						setAttributes( { dragAnywhere: next } )
 					}
 				/>
+
+				<InheritToggle
+					label={ __( 'Slide on hover', 'mai-image-compare' ) }
+					help={ __(
+						'The divider follows the pointer with no clicking.',
+						'mai-image-compare'
+					) }
+					value={ hover }
+					siteDefault={ SITE_DEFAULTS.hover }
+					onChange={ ( next ) => setAttributes( { hover: next } ) }
+				/>
+			</PanelBody>
+
+			<PanelBody
+				title={ __( 'Alt text', 'mai-image-compare' ) }
+				initialOpen={ false }
+			>
+				<p className="mai-image-compare-panel__intro">
+					{ __(
+						'Each image already uses the alt text from the Media Library. Override it here when this page needs to describe the image differently.',
+						'mai-image-compare'
+					) }
+				</p>
+				{ !! beforeId && (
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Before image', 'mai-image-compare' ) }
+						value={ beforeAlt }
+						onChange={ ( next ) =>
+							setAttributes( { beforeAlt: next } )
+						}
+					/>
+				) }
+				{ !! afterId && (
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'After image', 'mai-image-compare' ) }
+						value={ afterAlt }
+						onChange={ ( next ) =>
+							setAttributes( { afterAlt: next } )
+						}
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);

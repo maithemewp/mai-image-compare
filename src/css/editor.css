@@ -60,3 +60,8 @@
 	width: 100%;
 	height: 100%;
 }
+
+.mai-image-compare-panel__intro {
+	margin: 0 0 16px;
+	color: #757575;
+}

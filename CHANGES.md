@@ -5,7 +5,7 @@
 Initial release.
 
 - One block, `mai-image-compare/compare`: two images and a draggable divider.
-- Horizontal and vertical, optional labels, per-image alt text overrides.
+- Horizontal and vertical, optional labels, per-image alt text overrides in a collapsed panel.
 - Site-wide defaults for start position, slide on hover and drag anywhere, set in code through `mai_image_compare_defaults`. A block can deviate; one that does not follows the filter on the next page view.
 - WordPress's own aspect ratio control, falling back to the first image's shape. Mismatched images crop to fill rather than letterbox.
 - Keyboard control with arrows, Home and End, plus the slider role and value announcements the underlying component does not ship.

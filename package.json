@@ -24,6 +24,8 @@
     "@wordpress/element": "^8.7.0",
     "@wordpress/i18n": "^6.28.0",
     "@wordpress/scripts": "^32.6.0",
+    "playwright": "^1.63.0",
+    "pngjs": "^7.0.0",
     "webpack-remove-empty-scripts": "^1.1.1"
   }
 }

@@ -34,6 +34,10 @@ Insert **Mai Image Compare**, then pick two images. The block sidebar has a Befo
 
 Before is the image on the left, or on top in vertical mode. After is the other one.
 
+Labels are optional badges drawn over each image, and each one only shows while its own image is showing. They are not the Media Library's caption field, which is a separate thing this block does not use.
+
+Alt text lives in a collapsed panel at the bottom of the sidebar, because most of the time you do not need it. Each image already uses the alt text from the Media Library. The override is there for the case core's Image block solves the same way: the Media Library's alt text is global, so changing it changes every post using that image, and the right description sometimes depends on the page.
+
 ## Block attributes
 
 | Attribute | Type | Default | What it does |
@@ -42,8 +46,8 @@ Before is the image on the left, or on top in vertical mode. After is the other 
 | `afterId` | number | none | Attachment ID for the after image. |
 | `beforeAlt` | string | `""` | Alt text for the before image. Empty means use the Media Library's own alt text. |
 | `afterAlt` | string | `""` | Alt text for the after image. Empty means use the Media Library's own alt text. |
-| `beforeLabel` | string | `""` | Optional caption shown over the before image. Empty means no label. |
-| `afterLabel` | string | `""` | Optional caption shown over the after image. Empty means no label. |
+| `beforeLabel` | string | `""` | Optional badge shown over the before image. Empty means no label. |
+| `afterLabel` | string | `""` | Optional badge shown over the after image. Empty means no label. |
 | `direction` | string | `horizontal` | `horizontal` or `vertical`. |
 | `value` | number | *unset* | Start position, 0 to 100. Unset means follow the site default. |
 | `hover` | boolean | *unset* | Slide on mouse over, with no clicking. Unset means follow the site default. |

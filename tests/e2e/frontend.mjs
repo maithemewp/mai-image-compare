@@ -1,13 +1,18 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
+// Screenshots and the results log land here, outside version control.
+const OUT = new URL( './output/', import.meta.url ).pathname;
+fs.mkdirSync( OUT, { recursive: true } );
+import { PNG } from 'pngjs';
+
 const BASE = 'https://sportsdataio.test';
 const SEL = 'img-comparison-slider.wp-block-mai-image-compare-compare';
 const out = [];
 let failed = 0;
 
 const check = (name, pass, detail = '') => {
-  out.push(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`);
+  out.push(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail ? '  - ' + detail : ''}`);
   if (!pass) failed++;
 };
 
@@ -105,7 +110,7 @@ await page.mouse.move(vbox.x + vbox.w / 2, vbox.y + vbox.h * 0.7, { steps: 5 });
 await page.waitForTimeout(120);
 check('hover slides without a click', Math.round(await val()) !== 25, `value=${await val()}`);
 
-// handle-only, on a page where hover is off — with hover on, a mouse move
+// handle-only, on a page where hover is off. With hover on, a mouse move
 // slides whatever `handle` says, so the two must be tested apart.
 await go('mic-handleonly');
 const hbox = await page.$eval(SEL, (el) => { const b = el.getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; });
@@ -168,7 +173,56 @@ check('view script loads where the block is', someAssets.length === 1 && someAss
 const hasInline = await page.evaluate(() => (document.getElementById('mai-image-compare-compare-style-inline-css')?.textContent || ''));
 check('block styles inlined, including the component base', hasInline.includes('img-comparison-slider{visibility:hidden}') && hasInline.includes('object-fit:cover'));
 
-// --- 11. The defaults filter, applied and removed for real
+// --- 11. Label stacking, checked in pixels.
+//
+// Hit testing cannot answer this: the component's `.first` layer covers the
+// whole block and stays hit-testable whatever the divider is doing, because
+// only its inner container is clipped. So this reads the rendered colour where
+// the after label sits. A label must disappear once the other image covers the
+// block, which is why it carries no z-index.
+await go('mic-labels');
+const labelPixel = async ( value ) => {
+	const where = await page.evaluate( ( v ) => {
+		const host = document.querySelector( 'img-comparison-slider' );
+		host.value = v;
+		const label = host.querySelector(
+			'.mai-image-compare__side--after .mai-image-compare__label'
+		);
+		const box  = label.getBoundingClientRect();
+		const host_box = host.getBoundingClientRect();
+		// Four pixels in from the left edge, vertically centred. That lands in
+		// the badge's own padding, so it reads the background rather than a
+		// white glyph.
+		return {
+			x: Math.round( box.x + 4 - host_box.x ),
+			y: Math.round( box.y + box.height / 2 - host_box.y ),
+		};
+	}, value );
+
+	await page.waitForTimeout( 350 );
+
+	const shot = await ( await page.$( SEL ) ).screenshot();
+	const png  = PNG.sync.read( shot );
+	const i    = ( png.width * where.y + where.x ) << 2;
+
+	return { r: png.data[ i ], g: png.data[ i + 1 ], b: png.data[ i + 2 ] };
+};
+
+const dark = ( p ) => p.r < 90 && p.g < 90 && p.b < 90;
+
+const atZero = await labelPixel( 0 );
+check( 'after label is visible while its own image is showing', dark( atZero ), JSON.stringify( atZero ) );
+
+const atFull = await labelPixel( 100 );
+check( 'after label is hidden once the before image covers the block', ! dark( atFull ), JSON.stringify( atFull ) );
+
+const labelZ = await page.$eval(
+	`${ SEL } .mai-image-compare__side--after .mai-image-compare__label`,
+	( el ) => getComputedStyle( el ).zIndex
+);
+check( 'label carries no z-index', labelZ === 'auto', labelZ );
+
+// --- 12. The defaults filter, applied and removed for real
 const MU = `${process.env.HOME}/Herd/sportsdataio/wp-content/mu-plugins/mic-defaults-test.php`;
 fs.writeFileSync(MU, `<?php
 add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
@@ -200,7 +254,7 @@ const restored = await page.$eval(SEL, (el) => ({ v: Math.round(el.value), h: el
 // Built-in dragAnywhere is true, so the component's handle is false.
 check('removing the filter restores the built-in defaults', restored.v === 50 && restored.h === false && restored.d === false, JSON.stringify(restored));
 
-// --- 12. Clean console, no external requests
+// --- 13. Clean console, no external requests
 // The site runs its own ad and analytics stack on every page, so a raw count
 // is never zero and says nothing about this plugin. Measure what the block
 // itself adds: anything naming our assets or the component, and any external
@@ -208,21 +262,45 @@ check('removing the filter restores the built-in defaults', restored.v === 50 &&
 const ours = errors.filter((e) => /mai-image-compare|img-comparison|comparison-slider/i.test(e));
 check('zero console errors from the block', ours.length === 0, ours.slice(0, 3).join(' | '));
 
-const hosts = (list) => new Set(list.map((u) => new URL(u).hostname));
-const blockPageHosts = hosts(external.filter((u) => blockPageRequests.has(u)));
-const added = [ ...hosts(external) ].filter((h) => !baselineHosts.has(h) && blockPageHosts.has(h));
-check('block adds no external hosts over a page without it', added.length === 0, added.join(', '));
+// The site runs its own ad and analytics stack, and which third-party hosts it
+// reaches varies per page view, so diffing hosts between two pages is a coin
+// toss. This asks the real question instead: cut the block off from every
+// other origin and see whether it still works.
+const walled = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 900 } });
+const blocked = [];
+await walled.route('**', (route) => {
+	const url = new URL(route.request().url());
+
+	if ('sportsdataio.test' === url.hostname || 'data:' === url.protocol) {
+		return route.continue();
+	}
+
+	blocked.push(url.href);
+	return route.abort();
+});
+
+const wpage = await walled.newPage();
+await wpage.goto(`${BASE}/mic-default/`, { waitUntil: 'domcontentloaded' });
+await wpage.waitForFunction(() => !!customElements.get('img-comparison-slider'), null, { timeout: 30000 });
+check('block works with every other origin cut off', await wpage.$eval(SEL, (el) => el.classList.contains('rendered')));
+
+await wpage.focus(SEL);
+await wpage.keyboard.press('End');
+check('keyboard still works with every other origin cut off', Math.round(await wpage.$eval(SEL, (el) => el.value)) === 100);
+check('nothing the block needs was among the blocked requests', blocked.every((u) => !/mai-image-compare|img-comparison/i.test(u)), blocked.filter((u) => /mai-image-compare|img-comparison/i.test(u)).join(', '));
+await walled.close();
+
 check('no request to a CDN for the component', external.every((u) => !/jsdelivr|unpkg|cdnjs/i.test(u)), external.filter((u) => /jsdelivr|unpkg|cdnjs/i.test(u)).join(', '));
 
 // Screenshots
 for (const slug of ['mic-default', 'mic-loaded', 'mic-mismatch', 'mic-ratio']) {
   await go(slug);
   const el = await page.$(SEL);
-  await el.screenshot({ path: `shot-${slug}.png` });
+  await el.screenshot({ path: `${ OUT }shot-${ slug }.png` });
 }
 
 await browser.close();
-fs.writeFileSync('results.txt', out.join('\n'));
+fs.writeFileSync(OUT + 'results.txt', out.join('\n'));
 console.log(out.join('\n'));
 console.log(`\n${out.length - failed}/${out.length} passed`);
 process.exit(failed ? 1 : 0);

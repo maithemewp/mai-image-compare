@@ -1,6 +1,10 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
+// Screenshots and the results log land here, outside version control.
+const OUT = new URL( './output/', import.meta.url ).pathname;
+fs.mkdirSync( OUT, { recursive: true } );
+
 // The inherited labels are only meaningful against a filter that changes them,
 // so this run installs one and takes it away again.
 const MU = `${process.env.HOME}/Herd/sportsdataio/wp-content/mu-plugins/mic-defaults-test.php`;
@@ -13,7 +17,7 @@ add_filter( 'mai_image_compare_defaults', function( array $defaults ): array {
 process.on('exit', () => { try { fs.unlinkSync(MU); } catch (e) {} });
 const BASE='https://sportsdataio.test';
 const out=[]; let failed=0;
-const check=(n,p,d='')=>{out.push(`${p?'PASS':'FAIL'}  ${n}${d?'  — '+d:''}`); if(!p)failed++;};
+const check=(n,p,d='')=>{out.push(`${p?'PASS':'FAIL'}  ${n}${d?'  - '+d:''}`); if(!p)failed++;};
 
 const browser = await chromium.launch({ headless: true });
 const ctx = await browser.newContext({ ignoreHTTPSErrors:true, viewport:{width:1500,height:1000} });
@@ -54,7 +58,7 @@ const blockSel = '[data-type="mai-image-compare/compare"]';
 await canvas.waitForSelector(blockSel, { timeout: 30000 });
 check('block inserts from the inserter', await canvas.locator(blockSel).count() === 1);
 check('empty state shows a media placeholder', await canvas.locator(`${blockSel} .components-placeholder`).count() === 1);
-await page.screenshot({ path:'editor-1-placeholder.png' });
+await page.screenshot({ path: OUT + 'editor-1-placeholder.png' });
 
 // Pick both images through the real Media Library modal.
 const pickFromLibrary = async (title) => {
@@ -84,7 +88,7 @@ check('preview slider upgraded', await canvas.evaluate(() => !!document.querySel
 check('preview keeps the block class on the wrapper', await canvas.locator(`${blockSel}.wp-block-mai-image-compare-compare`).count() === 1);
 const pbox = await canvas.locator(`${blockSel} img-comparison-slider`).boundingBox();
 check('preview keeps the image aspect ratio', Math.abs(pbox.width / pbox.height - 1.5) < 0.05, `ratio=${(pbox.width/pbox.height).toFixed(3)}`);
-await page.screenshot({ path:'editor-2-preview.png' });
+await page.screenshot({ path: OUT + 'editor-2-preview.png' });
 
 // Inspector: the two media fields and the inherited labels.
 await canvas.locator(blockSel).click();
@@ -96,10 +100,6 @@ if ( await sidebar.count() === 0 || ! await sidebar.first().isVisible().catch(()
 }
 await page.locator('button[role="tab"]:has-text("Block"), .editor-sidebar__panel-tab:has-text("Block")').first().click().catch(()=>{});
 await page.waitForSelector('.mai-image-compare-field', { timeout: 25000 }).catch(()=>{});
-console.log('DBG sidebar visible', await sidebar.count(), await sidebar.first().isVisible().catch(()=>'?'), 'fields', await page.locator('.mai-image-compare-field').count());
-console.log('DBG sidebar text', (await sidebar.first().innerText().catch(()=>'ERR')).slice(0,500).replace(/\n+/g,' | '));
-console.log('DBG header buttons', JSON.stringify(await page.locator('.editor-header button, .edit-post-header button').evaluateAll(ns=>ns.map(n=>n.getAttribute('aria-label')||n.textContent.trim()).filter(Boolean))));
-await page.screenshot({path:'editor-sidebar-debug.png'});
 const fields = await page.locator('.mai-image-compare-field').count();
 check('two featured-image style media fields in the inspector', fields === 2, `${fields} fields`);
 // getMedia() resolves per field, so the second thumbnail can land a beat late.
@@ -113,11 +113,25 @@ check('both fields show a thumbnail', previews === 2, `${previews} thumbnails`);
 
 // The filter is active in an mu-plugin setting hover/handle true and value 30,
 // so the inherited labels must say so rather than showing a hardcoded guess.
-const hoverDefault = await page.locator('.editor-sidebar select, .interface-interface-skeleton__sidebar select').filter({ hasText:'Default (' }).first().locator('option').first().textContent().catch(()=>'');
-check('inherited option names the site default', /Default \(On\)/.test(hoverDefault || ''), hoverDefault || '');
+// The mu-plugin sets hover on and dragAnywhere off, so each inherited option
+// must name its own value rather than a hardcoded guess. Located by label,
+// because the panel order is a design choice that can change.
+const inheritOption = async ( label ) =>
+	( await page
+		.getByLabel( label, { exact: true } )
+		.locator( 'option' )
+		.first()
+		.textContent()
+		.catch( () => '' ) ) || '';
+
+const hoverDefault = await inheritOption( 'Slide on hover' );
+const dragDefault  = await inheritOption( 'Drag anywhere' );
+check( 'slide on hover names its inherited value', 'Default (On)' === hoverDefault.trim(), hoverDefault );
+check( 'drag anywhere names its inherited value', 'Default (Off)' === dragDefault.trim(), dragDefault );
+
 const startBox = await page.locator('.components-checkbox-control__label:has-text("Use site default start position")').textContent().catch(()=>'');
 check('start position checkbox names the site default', /30%/.test(startBox || ''), startBox || '');
-await page.screenshot({ path:'editor-3-inspector.png', fullPage:false });
+await page.screenshot({ path: OUT + 'editor-3-inspector.png', fullPage:false });
 
 // Publish and confirm the saved post content carries no value/hover/handle keys.
 await page.click('.editor-post-publish-panel__toggle, button.editor-post-publish-button__button');

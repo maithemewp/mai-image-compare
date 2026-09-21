@@ -15,7 +15,7 @@ The runs expect a local site at `https://sportsdataio.test` with:
 - Three images in the Media Library titled `MIC before` (1200x800),
   `MIC after` (1200x800) and `MIC tall` (800x1200).
 - Published pages at `mic-default`, `mic-loaded`, `mic-mismatch`, `mic-ratio`,
-  `mic-handleonly`, and `mic-none` (a page with no block on it).
+  `mic-handleonly`, `mic-labels`, and `mic-none` (a page with no block on it).
 - An administrator called `mictest`.
 
 Both runs write and remove their own mu-plugin to exercise the defaults filter,
@@ -23,9 +23,10 @@ so the site is left as it was found.
 
 ## Run
 
-1. Install Playwright.
+1. Install the Chromium build Playwright drives. The npm packages come with
+   `npm install`.
    ```
-   npm install -D playwright && npx playwright install chromium
+   npx playwright install chromium
    ```
 2. Run the front-end checks.
    ```

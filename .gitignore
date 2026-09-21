@@ -16,3 +16,6 @@
 
 # Node build tooling (dev-only). build/ output is committed (raw-tree deploy).
 /node_modules/
+
+# Screenshots and logs from the e2e runs.
+/tests/e2e/output/
