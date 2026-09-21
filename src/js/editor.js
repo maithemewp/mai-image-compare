@@ -412,7 +412,7 @@ function Edit( { attributes, setAttributes } ) {
 			</PanelBody>
 
 			<PanelBody
-				title={ __( 'Alt text', 'mai-image-compare' ) }
+				title={ __( 'Image alt text', 'mai-image-compare' ) }
 				initialOpen={ false }
 			>
 				<p className="mai-image-compare-panel__intro">

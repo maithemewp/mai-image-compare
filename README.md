@@ -36,7 +36,7 @@ Before is the image on the left, or on top in vertical mode. After is the other 
 
 Labels are optional badges drawn over each image, and each one only shows while its own image is showing. They are not the Media Library's caption field, which is a separate thing this block does not use.
 
-Alt text lives in a collapsed panel at the bottom of the sidebar, because most of the time you do not need it. Each image already uses the alt text from the Media Library. The override is there for the case core's Image block solves the same way: the Media Library's alt text is global, so changing it changes every post using that image, and the right description sometimes depends on the page.
+Alt text lives in a collapsed Image alt text panel at the bottom of the sidebar, because most of the time you do not need it. Each image already uses the alt text from the Media Library. The override is there for the case core's Image block solves the same way: the Media Library's alt text is global, so changing it changes every post using that image, and the right description sometimes depends on the page.
 
 ## Block attributes
 
