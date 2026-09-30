@@ -4,7 +4,7 @@
  * Plugin Name:     Mai Image Compare
  * Plugin URI:      https://bizbudding.com/
  * Description:     A before/after image comparison block. Two images, one draggable divider. Site-wide defaults are set in code via a filter; there is no settings page.
- * Version:         0.2.0
+ * Version:         0.2.1
  *
  * Author:          BizBudding
  * Author URI:      https://bizbudding.com
@@ -27,7 +27,7 @@ if ( defined( 'MAI_IMAGE_COMPARE_VERSION' ) ) {
 	return;
 }
 
-define( 'MAI_IMAGE_COMPARE_VERSION',    '0.2.0' );
+define( 'MAI_IMAGE_COMPARE_VERSION',    '0.2.1' );
 define( 'MAI_IMAGE_COMPARE_FILE',       __FILE__ );
 define( 'MAI_IMAGE_COMPARE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MAI_IMAGE_COMPARE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
