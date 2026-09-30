@@ -530,6 +530,15 @@ function Edit( { attributes, setAttributes } ) {
 							</span>
 						) }
 					</div>
+					{ /* Same markup the server renders, filter included, so
+					   the preview handle matches the page. */ }
+					<div
+						slot="handle"
+						className="mai-image-compare__handle"
+						dangerouslySetInnerHTML={ {
+							__html: window.maiImageCompareHandle ?? '',
+						} }
+					/>
 				</img-comparison-slider>
 			</div>
 		</>

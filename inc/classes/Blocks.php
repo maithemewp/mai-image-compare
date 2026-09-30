@@ -57,7 +57,8 @@ class Blocks {
 	public static function localize_defaults(): void {
 		wp_add_inline_script(
 			generate_block_asset_handle( self::NAME, 'editorScript' ),
-			'window.maiImageCompareDefaults = ' . wp_json_encode( Defaults::get() ) . ';',
+			'window.maiImageCompareDefaults = ' . wp_json_encode( Defaults::get() ) . ';'
+				. 'window.maiImageCompareHandle = ' . wp_json_encode( self::handle() ) . ';',
 			'before'
 		);
 	}
@@ -136,11 +137,40 @@ class Blocks {
 		] );
 
 		return sprintf(
-			'<img-comparison-slider %s>%s%s</img-comparison-slider>',
+			'<img-comparison-slider %s>%s%s<div slot="handle" class="mai-image-compare__handle">%s</div></img-comparison-slider>',
 			$wrapper,
 			self::side( 'first', $before, (string) ( $attributes['beforeLabel'] ?? '' ) ),
-			self::side( 'second', $after, (string) ( $attributes['afterLabel'] ?? '' ) )
+			self::side( 'second', $after, (string) ( $attributes['afterLabel'] ?? '' ) ),
+			self::handle()
 		);
+	}
+
+	/**
+	 * What sits inside the handle: two arrows, by default.
+	 *
+	 * The handle is our own markup in the component's `handle` slot, not its
+	 * built-in one. The built-in handle lives in shadow DOM, so page CSS cannot
+	 * give it a border, a background or a thicker stroke. Slotted markup stays
+	 * in the page, so a theme can style it like anything else.
+	 *
+	 * The arrow path is the component's own, so the shape matches the original.
+	 * The circle is the wrapping div, drawn in CSS.
+	 *
+	 * Not escaped: the filter is code, and escaping would strip the SVG.
+	 */
+	private static function handle(): string {
+		$default = '<svg xmlns="http://www.w3.org/2000/svg" class="mai-image-compare__arrows" viewBox="-8 -3 16 6" aria-hidden="true" focusable="false"><path d="M -5 -2 L -7 0 L -5 2 M 5 -2 L 7 0 L 5 2"/></svg>';
+
+		/**
+		 * Filters the markup inside the slider handle.
+		 *
+		 * The wrapping `.mai-image-compare__handle` div stays, so its circle,
+		 * border and background still apply. Return an empty string to keep
+		 * the circle with nothing in it.
+		 *
+		 * @param string $html The handle markup. Two arrows by default.
+		 */
+		return (string) apply_filters( 'mai_image_compare_handle', $default );
 	}
 
 	/**

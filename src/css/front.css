@@ -23,6 +23,13 @@
 	   aspect ratio chosen in the editor is written into the same property, so
 	   the images inside the shadow DOM cannot disagree with the box. */
 	aspect-ratio: var(--mai-image-compare-ratio, auto);
+
+	/* The divider is drawn inside the component's shadow DOM, which only these
+	   three properties reach. Mapped from our own names so every themeable
+	   value on the block shares one prefix. */
+	--divider-width: var(--mai-image-compare-divider-width, 2px);
+	--divider-color: var(--mai-image-compare-divider-color, #fff);
+	--divider-shadow: var(--mai-image-compare-divider-shadow, 0 0 4px rgb(0 0 0 / 40%));
 }
 
 /* The attribute selector is load-bearing, not decoration. The component's own
@@ -95,4 +102,39 @@ img-comparison-slider[direction="vertical"] .mai-image-compare__side--after .mai
 	bottom: var(--mai-image-compare-label-offset, 1rem);
 	inset-inline-start: var(--mai-image-compare-label-offset, 1rem);
 	inset-inline-end: auto;
+}
+
+/* Our own handle, passed in through the component's `handle` slot. The
+   component positions and rotates the slot for vertical sliders, so this only
+   has to draw the circle. It is see-through, so the photo shows in the middle,
+   and the shadow is what keeps the white ring visible over a bright photo. */
+img-comparison-slider .mai-image-compare__handle[slot] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: var(--mai-image-compare-handle-size, 48px);
+	height: var(--mai-image-compare-handle-size, 48px);
+	border: var(--mai-image-compare-handle-border-width, 2px) solid var(--mai-image-compare-handle-border-color, #fff);
+	border-radius: var(--mai-image-compare-handle-radius, 100vw);
+	background: var(--mai-image-compare-handle-background, transparent);
+	box-shadow: var(--mai-image-compare-handle-shadow, 0 0 6px rgb(0 0 0 / 35%));
+	color: var(--mai-image-compare-handle-color, #fff);
+}
+
+img-comparison-slider .mai-image-compare__arrows {
+	width: 70%;
+	height: auto;
+	fill: none;
+	stroke: currentcolor;
+	stroke-width: var(--mai-image-compare-handle-arrow-width, 2px);
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* Keeps the stroke in pixels. The viewBox is tiny, so a scaling stroke would
+   come out many times thicker than the value set. It does not inherit, so it
+   has to sit on the path itself. */
+img-comparison-slider .mai-image-compare__arrows path {
+	vector-effect: non-scaling-stroke;
 }

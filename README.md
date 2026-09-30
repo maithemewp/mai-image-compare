@@ -107,24 +107,20 @@ There is deliberately no setting for keyboard control. It is always on.
 
 Set these on `:root`, on `.wp-block-mai-image-compare-compare`, or on your own class.
 
-### From the component
-
-| Property | Default | What it does |
-| --- | --- | --- |
-| `--divider-width` | `1px` | Width of the line between the two images. |
-| `--divider-color` | `#fff` | Colour of that line. |
-| `--divider-shadow` | `none` | Shadow cast by that line. |
-| `--handle-position-start` | `50%` | Where the handle sits along the divider. |
-| `--default-handle-width` | `50px` | Width of the built-in handle. |
-| `--default-handle-color` | `#fff` | Colour of the built-in handle. |
-| `--default-handle-opacity` | `1` | Opacity of the built-in handle. |
-| `--default-handle-shadow` | `none` | Shadow cast by the built-in handle. |
-
-### From this plugin
-
 | Property | Default | What it does |
 | --- | --- | --- |
 | `--mai-image-compare-ratio` | the before image's shape | The block's aspect ratio. Set by the block; override it only if you want every comparison on the site locked to one shape. |
+| `--mai-image-compare-divider-width` | `2px` | Width of the line between the two images. |
+| `--mai-image-compare-divider-color` | `#fff` | Colour of that line. |
+| `--mai-image-compare-divider-shadow` | `0 0 4px rgb( 0 0 0 / 40% )` | Shadow cast by that line. |
+| `--mai-image-compare-handle-size` | `48px` | Width and height of the handle. |
+| `--mai-image-compare-handle-radius` | `100vw` | Corner radius of the handle. The default makes it a circle. |
+| `--mai-image-compare-handle-border-width` | `2px` | Width of the handle's border. |
+| `--mai-image-compare-handle-border-color` | `#fff` | Colour of the handle's border. |
+| `--mai-image-compare-handle-background` | `transparent` | Handle background. See-through by default, so the photo shows in the middle. |
+| `--mai-image-compare-handle-shadow` | `0 0 6px rgb( 0 0 0 / 35% )` | Shadow cast by the handle. |
+| `--mai-image-compare-handle-color` | `#fff` | Colour of the arrows. |
+| `--mai-image-compare-handle-arrow-width` | `2px` | Stroke width of the arrows. |
 | `--mai-image-compare-label-offset` | `1rem` | Distance from the label to the nearest two edges. |
 | `--mai-image-compare-label-padding` | `0.25em 0.75em` | Padding inside the label. |
 | `--mai-image-compare-label-radius` | `3px` | Corner radius of the label. |
@@ -136,13 +132,35 @@ Example:
 
 ```css
 :root {
-	--divider-color: #ffd400;
-	--divider-width: 3px;
-	--default-handle-color: #ffd400;
+	--mai-image-compare-divider-color: #ffd400;
+	--mai-image-compare-handle-border-color: #ffd400;
+	--mai-image-compare-handle-background: #ffd400;
+	--mai-image-compare-handle-color: #111;
 	--mai-image-compare-label-background: rgb( 255 212 0 / 90% );
 	--mai-image-compare-label-color: #111;
 }
 ```
+
+For anything the properties don't cover, target `.mai-image-compare__handle` (the circle) and `.mai-image-compare__arrows` (the arrow SVG) directly. The handle is ordinary page markup, so normal CSS reaches it.
+
+## Changing what's inside the handle
+
+The `mai_image_compare_handle` filter swaps the arrows for your own markup. The circle stays, so the custom properties above still style it. The editor preview uses the same markup.
+
+```php
+/**
+ * Replaces the image compare arrows with the word "Slide".
+ *
+ * @param string $html The handle markup. Two arrows by default.
+ *
+ * @return string
+ */
+add_filter( 'mai_image_compare_handle', function( string $html ): string {
+	return '<span class="my-handle-text">Slide</span>';
+} );
+```
+
+The markup is output as is, so it can include an SVG. It isn't escaped, so don't build it from user input.
 
 ## Images of different sizes
 
